@@ -14,7 +14,8 @@
 	var/muzzled = is_muzzled()
 	//var/m_type = 1
 
-	for (var/obj/item/weapon/implant/I in src)
+	for(var/obj/item/organ/O in src.organs)
+		for (var/obj/item/weapon/implant/I in O)
 		if (I.implanted)
 			I.trigger(act, src)
 
@@ -80,10 +81,11 @@
 
 		//Promethean-only emotes
 		if("squish")
-			if(!species.bump_flag == SLIME) //That should do, yaya.
+			/* VOREStation Removal Start - Eh. People can squish maybe.
+			if(species.bump_flag != SLIME) //This should definitely do it.
 				src << "<span class='warning'>You are not a slime thing!</span>"
 				return
-
+			*/ //VOREStation Removal End
 			playsound(src.loc, 'sound/effects/slime_squish.ogg', 50, 0) //Credit to DrMinky (freesound.org) for the sound.
 			message = "squishes."
 			m_type = 1
