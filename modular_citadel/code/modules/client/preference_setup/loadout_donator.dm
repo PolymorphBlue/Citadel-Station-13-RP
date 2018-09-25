@@ -12,10 +12,16 @@
 */
 
 /datum/gear/donator/gladiator
-    display_name = "Gladiator Armor"
+	display_name = "Gladiator Armor"
 	slot = slot_wear_suit
-    path = /obj/item/clothing/under/gladiator
-    ckeywhitelist = list("aroche")
+	path = /obj/item/clothing/under/gladiator
+	ckeywhitelist = list("aroche")
+
+/datum/gear/donator/keyholesweater
+	display_name = "Keyhole Sweater"
+	slot = slot_wear_suit
+	path = /obj/item/clothing/under/donator/crystalnole
+	ckeywhitelist = list("crystal9156")
 
 /datum/gear/donator/chayse
 	display_name = "NTSC Naval Uniform"
