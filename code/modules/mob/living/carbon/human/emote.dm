@@ -1,6 +1,6 @@
 /mob/living/carbon/human/emote(var/act,var/m_type=1,var/message = null)
 	var/param = null
-	
+
 	var/datum/gender/T = gender_datums[get_visible_gender()]
 
 	if (findtext(act, "-", 1, null))
@@ -16,8 +16,8 @@
 
 	for(var/obj/item/organ/O in src.organs)
 		for (var/obj/item/weapon/implant/I in O)
-		if (I.implanted)
-			I.trigger(act, src)
+			if (I.implanted)
+				I.trigger(act, src)
 
 	if(src.stat == 2.0 && (act != "deathgasp"))
 		return
@@ -655,7 +655,7 @@
 					message = "<span class='danger'>slaps [T.himself]!</span>"
 					playsound(loc, 'sound/effects/snap.ogg', 50, 1)
 
-// Citadel changes starts here
+//Citadel changes starts here
 		if("aslap", "aslaps")
 			m_type = 1
 			if(!restrained())
@@ -673,7 +673,7 @@
 					message = "<span class='danger'>slaps [T.his] own butt!</span>"
 					playsound(loc, 'sound/effects/snap.ogg', 50, 1)
 					add_attack_logs(src,src,"Slapped own butt")
-// Citadel changes ends here
+//Citadel changes ends here
 
 		if("scream", "screams")
 			if(miming)
@@ -712,6 +712,36 @@
 			message = "snaps [T.his] fingers."
 			playsound(loc, 'sound/effects/fingersnap.ogg', 50, 1, -3)
 
+
+			///////////////////////// CITADEL STATION ADDITIONS START
+			emoteDanger =  min(1+(emoteDanger*2), 100)
+			var/danger = emoteDanger - 5//Base chance to break something. Snapping is inherently less dangerous.
+			var/list/involved_parts = list(BP_L_HAND, BP_R_HAND, BP_L_ARM, BP_R_ARM) // Snapping is dangerous yo
+			for(var/organ_name in involved_parts)
+				var/obj/item/organ/external/E = get_organ(organ_name)
+				if(!E || E.is_stump() || E.splinted || (E.status & ORGAN_BROKEN))
+					involved_parts -= organ_name
+					danger += 5 //Add 5% to the chance for each problem limb
+
+
+			if(prob(danger))
+				spawn(10) //Don't be so rough with your hands...
+					var/breaking = pick(involved_parts)
+					var/obj/item/organ/external/E = get_organ(breaking)
+					if(isSynthetic())
+						src.Weaken(5)
+						E.droplimb(1,DROPLIMB_EDGE)
+						message += " <span class='danger'>And loses a limb!</span>"
+						log_and_message_admins("lost their [breaking] with *snap, ahahah.", src)
+					else
+						src.Weaken(5)
+						if(E.cannot_break) //Prometheans go splat
+							E.droplimb(0,DROPLIMB_BLUNT)
+						else
+							E.fracture()
+						message += " <span class='danger'>And breaks something!</span>"
+						log_and_message_admins("broke their [breaking] with *snap, ahahah.", src)
+			///////////////////////// CITADEL STATION ADDITIONS END
 		if("swish")
 			src.animate_tail_once()
 
@@ -761,7 +791,7 @@
 	set name = "Set Pose"
 	set desc = "Sets a description which will be shown when someone examines you."
 	set category = "IC"
-	
+
 	var/datum/gender/T = gender_datums[get_visible_gender()]
 
 	pose =  sanitize(input(usr, "This is [src]. [T.he]...", "Pose", null)  as text)
